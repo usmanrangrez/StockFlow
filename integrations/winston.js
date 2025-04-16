@@ -3,12 +3,12 @@ import constants from "../config/constants.js";
 import { Logtail } from '@logtail/node';  
 import { LogtailTransport } from "@logtail/winston"; 
 
-const { combine, timestamp, json, colorize, simple } = winston.format;
+const { combine, timestamp, json, colorize, simple, label } = winston.format;
 
 export class Logger {
   static instance;
 
-  constructor(filename = "app.log") {
+  constructor(sourceFile = "Unknown") {
     if (Logger.instance) {
       return Logger.instance;
     }
@@ -20,22 +20,23 @@ export class Logger {
     this.logger = winston.createLogger({
       level: "info",
       format: combine(
+        label({ label: sourceFile }),
         timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS A" }),
         json()
       ),
       transports: [
         new winston.transports.File({ filename: "logs.log", level: "info" }),
-        // You can uncomment these when ready for remote logging
-        // resume in betterstack account!
-        // new LogtailTransport(logtailClient)
+        // Uncomment to enable Logtail logging for remote service
+        // new LogtailTransport(logtailClient),
       ],
     });
 
-    if (process.env.NODE_ENV !== constants.prod) {
+    if (process.env.NODE_ENV !== constants.env.prod) {
       this.logger.add(
         new winston.transports.Console({
           format: combine(
             colorize(),
+            label({ label: sourceFile }),  // Show source file in console log
             timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS A" }),
             simple()
           ),
@@ -70,5 +71,3 @@ export class Logger {
     this.logger.silly(message);
   }
 }
-
-

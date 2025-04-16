@@ -3,11 +3,15 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { Logger } from "./integrations/winston.js";
-import router from "./routes/index.js";
+import router from "./routes/index.route.js";
 import morganMiddleware from "./middlewares/morgan.js";
 import errorHanlder from "./middlewares/error.js";
+import { Database } from "./integrations/database.js";
+
 
 const logger = new Logger();
+const db = new Database({enableConnectionHooks:process.env.ENABLE_CONNECTION_HOOKS});
+const sequelize = db.getSequelize();
 
 class AppServer {
   constructor() {
@@ -19,6 +23,7 @@ class AppServer {
     this.setupErrorHandler();
     this.startServer();
     this.handleGracefulShutdown();
+    this.connectDB();
   }
 
   setupMiddleware() {
@@ -41,21 +46,29 @@ class AppServer {
 
       this.server.on("error", (err) => {
         if (err.code === "EADDRINUSE") {
-          logger.error(
-            `Port ${this.port} is already in use. Maybe another instance is running?`
-          );
+          logger.error(`Port ${this.port} is already in use. Maybe another instance is running?`);
         } else {
-          logger.error("Server error:", err);
+          logger.error(`Server error:${err}`);
         }
         process.exit(1);
       });
     } catch (error) {
-      logger.error("Error starting server:", error);
+      logger.error(`Error starting server: ${error}`);
     }
   }
 
   setupErrorHandler() {
     this.app.use(errorHanlder);
+  }
+
+  async connectDB() {
+    try {
+      await sequelize.authenticate();
+      logger.info("Database connection established successfully.");
+    } catch (error) {
+      logger.error(`Database connection error:${error}`);
+      process.exit(1);
+    }
   }
 
   handleGracefulShutdown() {
@@ -79,5 +92,5 @@ class AppServer {
 try {
   new AppServer();
 } catch (error) {
-  logger.error("AppServer initialization failed:", error);
+  logger.error(`AppServer initialization failed:${error}`);
 }

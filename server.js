@@ -7,11 +7,12 @@ import router from "./routes/index.route.js";
 import morganMiddleware from "./middlewares/morgan.js";
 import errorHanlder from "./middlewares/error.js";
 import { Database } from "./integrations/database.js";
-
+import rateLimitter from "./integrations/rateLimiter.js";
 
 const logger = new Logger();
-const db = new Database({enableConnectionHooks:process.env.ENABLE_CONNECTION_HOOKS});
-const sequelize = db.getSequelize();
+new Database();
+const db = Database.getSequelize();
+
 
 class AppServer {
   constructor() {
@@ -32,6 +33,7 @@ class AppServer {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(morganMiddleware);
+    this.app.use(rateLimitter);
   }
 
   setupRoutes() {
@@ -63,7 +65,7 @@ class AppServer {
 
   async connectDB() {
     try {
-      await sequelize.authenticate();
+      await db.authenticate();
       logger.info("Database connection established successfully.");
     } catch (error) {
       logger.error(`Database connection error:${error}`);

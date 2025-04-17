@@ -6,16 +6,17 @@ const logger = new Logger("database.js");
 
 export class Database {
   static instance;
-
-  constructor({ enableConnectionHooks = false } = {}) {
+  static sequelize;
+  
+  constructor() {
     if (Database.instance) {
       return Database.instance;
     }
-
-    this.sequelize = new Sequelize({
+    
+    Database.sequelize = new Sequelize({
       dialect: process.env.DB_DIALECT,
       host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
+      port: parseInt(process.env.DB_PORT),
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
@@ -31,54 +32,60 @@ export class Database {
           ? {
               ssl: {
                 require: true,
-                rejectUnauthorized: false, //using supabase which has self hosted certs (so keep false)
+                rejectUnauthorized: false,
               },
             }
           : {},
     });
-    if (enableConnectionHooks == constants.boolean.true) {
-      this.setupConnectionHooks(); //test only once trail purpose
+    
+    const enableHooks = process.env.ENABLE_CONNECTION_HOOKS
+                       
+    if (enableHooks) {
+      this.setupConnectionHooks();
     }
-    // this.testConnection(); //turning on will test connection twice one from here and other from server.js
+    
     Database.instance = this;
   }
-
+  
+  static getSequelize() {
+    if (!Database.sequelize) {
+      new Database();
+    }
+    return Database.sequelize;
+  }
+  
   setupConnectionHooks() {
-    this.sequelize.beforeConnect(async (config) => {
+    Database.sequelize.beforeConnect(async (config) => {
       logger.info(
         `[HOOK - beforeConnect] Preparing to connect to DB at ${config.host}:${config.port} as user "${config.username}"`
       );
     });
-
-    this.sequelize.afterConnect(async (connection, config) => {
+    
+    Database.sequelize.afterConnect(async (connection, config) => {
       logger.info(
         `[HOOK - afterConnect] Successfully connected to DB at ${config.host}:${config.port} as user "${config.username}"`
       );
     });
-
-    this.sequelize.beforeDisconnect(async (connection) => {
+    
+    Database.sequelize.beforeDisconnect(async (connection) => {
       logger.info(
         "[HOOK - beforeDisconnect] Preparing to disconnect from the database..."
       );
     });
-
-    this.sequelize.afterDisconnect(async (connection) => {
+    
+    Database.sequelize.afterDisconnect(async (connection) => {
       logger.info(
         "[HOOK - afterDisconnect] Successfully disconnected from the database."
       );
     });
   }
-
+  
   async testConnection() {
     try {
-      await this.sequelize.authenticate();
+      await Database.sequelize.authenticate();
       logger.info("Database connection established successfully.");
     } catch (error) {
       logger.error(`Unable to connect to the database:${error}`);
     }
-  }
-
-  getSequelize() {
-    return this.sequelize;
   }
 }

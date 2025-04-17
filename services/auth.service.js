@@ -6,6 +6,7 @@ import { Codes } from "../config/codes.js";
 import User from "../models/user.model.js";
 import { Cache } from "../integrations/redis.js";
 import constants from "../config/constants.js";
+import { Twil } from "../integrations/sms.js";
 
 const logger = new Logger();
 const nodeCache = new NodeCache();
@@ -15,9 +16,10 @@ class AuthService {
   constructor() {
     this.user = User;
     this.bcryptSaltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS);
+    this.twil = new Twil();
   }
 
-  async register(username, email, password, role, active) {
+  async register(username, email, password, phone, role, active) {
     try {
       const existingUser = await this.user.findOne({ where: { email } });
       if (existingUser) {
@@ -26,9 +28,15 @@ class AuthService {
       }
 
       const hashedPassword = await bcrypt.hash(password, this.bcryptSaltRounds);
-      const newUser = await this.user.create({ username, email, password: hashedPassword, role, active });
+      const newUser = await this.user.create({ username, email, password: hashedPassword,phone, role, active });
 
       logger.info(`AuthService.register: user registered successfully with email ${email}`);
+      if(!this.twil.enabled) logger.info(`Sms provider disabled`)
+
+      if (this.twil.enabled && newUser.phone) {
+        const message = `Welcome ${newUser.username}! Email: ${newUser.email}, Password: ${password}.`;
+        this.twil.sendSMS(`+91${newUser.phone}`, message);
+      }
 
       const userWithoutPassword = newUser.toJSON();
       delete userWithoutPassword.password;
@@ -45,7 +53,7 @@ class AuthService {
       const user = await this.user.findOne({ where: { email } });
       if (!user) {
         logger.error(`AuthService.login: user not found with email ${email}`);
-        throw new Error(Codes.STX0008);
+        throw new Error(Codes.STX0011);
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -61,6 +69,7 @@ class AuthService {
       );
 
       logger.info(`AuthService.login: user logged in successfully with email ${email}`);
+
       return { username: user.username, accessToken };
     } catch (error) {
       logger.error(`AuthService.login: ${error.message}`);
@@ -79,7 +88,6 @@ class AuthService {
       const currentTime = Math.floor(Date.now() / 1000);
       const ttl = Math.max(tokenData.exp - currentTime, 1);
 
-      // Blacklist token based on cache availability
       if (process.env.REDIS_CONNECTION == constants.boolean.true) {
         logger.info("AuthService.logout: using Redis for token blacklisting");
         await redisCache.set(accessToken, true, ttl);

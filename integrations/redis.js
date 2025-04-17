@@ -4,6 +4,7 @@ import constants from "../config/constants.js";
 
 const logger = new Logger("redis.js");
 
+//using redis upstash
 export class Cache {
     static instance = null;
 

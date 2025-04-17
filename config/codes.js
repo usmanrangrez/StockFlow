@@ -9,4 +9,5 @@ export const Codes = {
     STX0008: "User login failed!",
     STX0009: "User logout failed!",
     STX0010: "User registeration failed!",
+    STX0011: "User not found!",
 }

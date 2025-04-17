@@ -9,6 +9,7 @@ const registerSchema = Joi.object({
         .required()
         .messages({ 'any.only': 'Passwords must match' }),
     email: Joi.string().email().required(),
+    phone: Joi.string().min(10).max(10).required(),
     role: Joi.string().valid(constants.db.roles.admin, constants.db.roles.manager, constants.db.roles.sales).required(),
     active: Joi.boolean().required(),
 });

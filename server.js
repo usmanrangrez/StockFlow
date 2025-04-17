@@ -8,16 +8,19 @@ import morganMiddleware from "./middlewares/morgan.js";
 import errorHanlder from "./middlewares/error.js";
 import { Database } from "./integrations/database.js";
 import rateLimitter from "./integrations/rateLimiter.js";
+import { Cache } from "./integrations/redis.js";
+import constants from "./config/constants.js";
 
 const logger = new Logger();
 new Database();
 const db = Database.getSequelize();
+const cache = new Cache();
 
 
 class AppServer {
   constructor() {
     this.app = express();
-    this.port = process.env.PORT || 3000;
+    this.port = process.env.PORT;
     this.server = null;
     this.setupMiddleware();
     this.setupRoutes();
@@ -25,6 +28,7 @@ class AppServer {
     this.startServer();
     this.handleGracefulShutdown();
     this.connectDB();
+    if (process.env.REDIS_ENABLE == constants.boolean.true) this.connectCache();
   }
 
   setupMiddleware() {
@@ -88,6 +92,17 @@ class AppServer {
 
     process.on("SIGINT", shutdown);
     process.on("SIGTERM", shutdown);
+  }
+
+  async connectCache() {
+    try {
+      const res = await cache.testConnection();
+      if (res) process.env.REDIS_CONNECTION = true;
+      else process.env.REDIS_CONNECTION = false;
+    } catch (error) {
+      logger.warn("Redis unavailable, continuing without cache.");
+      logger.error(`Redis connection error: ${error}`);
+    }
   }
 }
 

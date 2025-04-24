@@ -16,4 +16,13 @@ export const Codes = {
     STX0015: "Old password is incorrect!",
     STX0016: "Old password and new password are same",
     STX0017: "You are not authorized to perform this action",
+    STX0018: "User details fetched successfully",   
+    STX0019: "Users fetched successfully",   
+    STX0020: "No users present",   
+    STX0021: "Schema is required",   
+    STX0022: "User details updated successfully",   
+    STX0023: "User is deactivated",   
+    STX0024: "Username is required",   
+    STX0025: "User deleted successfully",   
+    STX0026: "Cannot delete the last admin user",   
 }

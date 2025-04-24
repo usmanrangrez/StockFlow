@@ -18,9 +18,9 @@ class AuthController {
 
     login = async (req, res, next) => {
         try {
-            const { email, password } = req.body;
-            const { username, accessToken } = await this.authService.login(email, password);
-            res.sendSuccess(200, Codes.STX0004, { username, accessToken });
+            const { username, password } = req.body;
+            const data = await this.authService.login(username, password);
+            res.sendSuccess(200, Codes.STX0004, data);
         } catch (error) {
             next(error);
         }

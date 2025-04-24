@@ -1,4 +1,3 @@
-// validators/index.js
 import Joi from 'joi';
 import constants from '../config/constants.js';
 
@@ -20,7 +19,7 @@ export const registerSchema = Joi.object({
 });
 
 export const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
+  username: Joi.string().min(3).required(),
   password: Joi.string().min(8).required(),
 });
 

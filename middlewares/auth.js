@@ -5,6 +5,7 @@ import { Logger } from "../integrations/winston.js";
 import { nodeCache } from '../integrations/nodeCache.js';
 import { Cache } from "../integrations/redis.js";
 import { ForbiddenError, UnauthorizedError } from "../utils/error.js";
+import UserService from "../services/user.service.js";
 
 const redisCache = new Cache();
 const logger = new Logger("authmiddleware.js");
@@ -28,12 +29,32 @@ export const verifyToken = async (req, res, next) => {
     }
 }
 
-export const verifyRole = (allowedRoles = []) => {
+export const checkActiveUser = async (req, res, next) => {
+    try {
+        const username = req?.user?.username || req?.body?.username;
+        if (!username) throw ForbiddenError(Codes.STX0024);
+        const userService = new UserService();
+        const user = await userService.getDetails(username);
+
+        if (!user?.active) throw ForbiddenError(Codes.STX0023);
+        next();
+    } catch (error) {
+        logger.error(`checkActiveUser: ${error.message}`);
+        next(error);
+    }
+};
+
+export const verifyRole = (allowedRoles = [], { restrictParamAccess = false } = {}) => {
     return async (req, res, next) => {
         try {
             const user = req.user;
             const userRole = user.role;
-            if (!allowedRoles.includes(userRole)) throw ForbiddenError(Codes.STX0017);
+            const requestedUsername = req.params.username;
+
+            //restrictParamAccess is used to restrict access to a specific user
+            //if the user is not an admin and is trying to access another user's data
+            if (restrictParamAccess && requestedUsername && !allowedRoles.includes(userRole)) throw ForbiddenError(Codes.STX0017);
+
             next();
         } catch (error) {
             logger.error(`AuthService.verifyRole: ${error.message}`);
@@ -43,14 +64,18 @@ export const verifyRole = (allowedRoles = []) => {
 };
 
 
-
 export const isTokenBlacklisted = async (token) => {
-    if (process.env.REDIS_CONNECTION === "true" || process.env.REDIS_CONNECTION === constants.boolean.true) {
-        const value = await redisCache.get(token);
-        return Boolean(value);
-    } else {
-        const hasToken = nodeCache.has(token);
-        return hasToken;
+    try {
+        if (process.env.REDIS_CONNECTION == constants.boolean.true || process.env.REDIS_CONNECTION === constants.boolean.true) {
+            const value = await redisCache.get(token);
+            return Boolean(value);
+        } else {
+            const hasToken = nodeCache.has(token);
+            return hasToken;
+        }
+    } catch (error) {
+        logger.error(`AuthService.isTokenBlacklisted: ${error.message}`);
+        throw new Error(Codes.STX0014);
     }
 }
 

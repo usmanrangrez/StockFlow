@@ -13,8 +13,10 @@ const constants = {
       manager: "manager",
       staff: "staff",
     },
-    changePasswordRoles: ["admin", "manager"],
+    adminCumManager: ["admin", "manager"],
     resetPasswordRoles: ["admin"],
+    getDetailsAccessRoles: ["admin"],
+    adminOnly: ["admin"],
     columnNames: {
       createdAt: "created_at",
       updatedAt: "updated_at",

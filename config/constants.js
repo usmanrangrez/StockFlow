@@ -11,13 +11,10 @@ const constants = {
     roles: {
       admin: "admin",
       manager: "manager",
-      sales: "sales",
+      staff: "staff",
     },
-    rolesArray: [
-      "admin",
-      "manager",
-      "sales",
-    ],
+    changePasswordRoles: ["admin", "manager"],
+    resetPasswordRoles: ["admin"],
     columnNames: {
       createdAt: "created_at",
       updatedAt: "updated_at",

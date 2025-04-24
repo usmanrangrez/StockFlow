@@ -31,7 +31,7 @@ User.init(
       type: DataTypes.ENUM(
         constants.db.roles.admin,
         constants.db.roles.manager,
-        constants.db.roles.sales
+        constants.db.roles.staff
       ),
       allowNull: false,
     },

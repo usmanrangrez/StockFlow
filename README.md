@@ -8,7 +8,7 @@
 - Company management
 - Dealer management
 - Product and inventory tracking
-- Stock transactions (sales/returns)
+- Stock transactions (staff/returns)
 - Payment transactions and tracking
 - Warehouse location management
 - Reporting

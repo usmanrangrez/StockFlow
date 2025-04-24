@@ -47,17 +47,17 @@ class AuthService {
     }
   }
 
-  async login(email, password) {
+  async login(username, password) {
     try {
-      const user = await this.user.findOne({ where: { email } });
+      const user = await this.user.findOne({ where: { username }, raw: true });
       if (!user) {
-        logger.error(`AuthService.login: user not found with email ${email}`);
+        logger.error(`AuthService.login: user not found with username ${username}`);
         throw new Error(Codes.STX0011);
       }
-
+      
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        logger.error(`AuthService.login: incorrect password for email ${email}`);
+        logger.error(`AuthService.login: incorrect password for username ${username}`);
         throw new Error(Codes.STX0005);
       }
 
@@ -67,9 +67,10 @@ class AuthService {
         parseInt(process.env.ACCESS_TOKEN_EXPIRY)
       );
 
-      logger.info(`AuthService.login: user logged in successfully with email ${email}`);
+      delete user.password;
+      logger.info(`AuthService.login: user logged in successfully with username ${username}`);
 
-      return { username: user.username, accessToken };
+      return { user, accessToken };
     } catch (error) {
       logger.error(`AuthService.login: ${error.message}`);
       throw error;

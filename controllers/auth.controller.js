@@ -9,9 +9,8 @@ class AuthController {
     register = async (req, res, next) => {
         try {
             const { username, email, password, role, active, phone } = req.body;
-            const newUser = await this.authService.register(username, email, password, phone, role, active)
-
-            res.status(201).json({ message: Codes.STX0003, data: { user: newUser } });
+            const newUser = await this.authService.register(username, email, password, phone, role, active);
+            res.sendSuccess(201, Codes.STX0003, newUser);
         } catch (error) {
             next(error);
         }
@@ -20,9 +19,8 @@ class AuthController {
     login = async (req, res, next) => {
         try {
             const { email, password } = req.body;
-            const { username, accessToken } = await this.authService.login(email, password)
-
-            res.status(200).json({ message: Codes.STX0004, data: { username, accessToken } });
+            const { username, accessToken } = await this.authService.login(email, password);
+            res.sendSuccess(200, Codes.STX0004, { username, accessToken });
         } catch (error) {
             next(error);
         }
@@ -31,9 +29,8 @@ class AuthController {
     changePassword = async (req, res, next) => {
         try {
             const { username, oldPassword, newPassword } = req.body;
-            const data = await this.authService.changePassword(username, oldPassword, newPassword)
-
-            res.status(201).json({ message: Codes.STX0013, data: { username: data.username } });
+            const data = await this.authService.changePassword(username, oldPassword, newPassword);
+            res.sendSuccess(201, Codes.STX0013, { username: data.username });
         } catch (error) {
             next(error);
         }
@@ -42,9 +39,8 @@ class AuthController {
     resetPassword = async (req, res, next) => {
         try {
             const { username } = req.body;
-            const data = await this.authService.resetPassword(username)
-
-            res.status(201).json({ message: Codes.STX0013, data: { username: data.username } });
+            const data = await this.authService.resetPassword(username);
+            res.sendSuccess(201, Codes.STX0013, { username: data.username });
         } catch (error) {
             next(error);
         }
@@ -53,8 +49,8 @@ class AuthController {
     logout = async (req, res, next) => {
         try {
             const accessToken = req.headers.authorization.split(' ').pop()
-            const data = await this.authService.logout(accessToken, req.user)
-            res.status(200).json({ message: Codes.STX0007, username: data.username });
+            const data = await this.authService.logout(accessToken, req.user);
+            res.sendSuccess(200, Codes.STX0007, { username: data.username });
         } catch (error) {
             next(error);
         }

@@ -10,6 +10,7 @@ import { Database } from "./integrations/database.js";
 import rateLimitter from "./integrations/rateLimiter.js";
 import { Cache } from "./integrations/redis.js";
 import constants from "./config/constants.js";
+import responseEnhancer from "./middlewares/response.js";
 
 const logger = new Logger();
 new Database();
@@ -38,6 +39,7 @@ class AppServer {
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(morganMiddleware);
     this.app.use(rateLimitter);
+    this.app.use(responseEnhancer);
   }
 
   setupRoutes() {

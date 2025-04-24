@@ -8,6 +8,7 @@ export class DefaultController {
     try {
       // Health check object
       const healthCheck = {
+        success:true,
         status: "OK",
         message: "Server is running!",
         timestamp: new Date().toISOString(),

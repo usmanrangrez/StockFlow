@@ -1,7 +1,7 @@
 import { Logger } from "../integrations/winston.js";
 const errorLogger = new Logger("error.js");
 
-const errorHanlder = (err, req, res, next) => {
+const errorHanlder = (err, req, res, next) => {  
   errorLogger.error(err.message);
   const errStatus = err.statusCode || 500;
   const errMsg = err.message || "Something went wrong";

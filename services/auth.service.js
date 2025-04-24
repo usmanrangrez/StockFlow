@@ -1,15 +1,14 @@
 import bcrypt from "bcrypt";
 import { Logger } from "../integrations/winston.js";
-import jwt from "jsonwebtoken";
-import NodeCache from "node-cache";
+import { nodeCache } from '../integrations/nodeCache.js';
 import { Codes } from "../config/codes.js";
 import User from "../models/user.model.js";
 import { Cache } from "../integrations/redis.js";
 import constants from "../config/constants.js";
 import { Twil } from "../integrations/sms.js";
+import { generateToken } from "../middlewares/auth.js";
 
 const logger = new Logger();
-const nodeCache = new NodeCache();
 const redisCache = new Cache();
 
 class AuthService {
@@ -28,10 +27,10 @@ class AuthService {
       }
 
       const hashedPassword = await bcrypt.hash(password, this.bcryptSaltRounds);
-      const newUser = await this.user.create({ username, email, password: hashedPassword,phone, role, active });
+      const newUser = await this.user.create({ username, email, password: hashedPassword, phone, role, active });
 
       logger.info(`AuthService.register: user registered successfully with email ${email}`);
-      if(!this.twil.enabled) logger.info(`Sms provider disabled`)
+      if (!this.twil.enabled) logger.info(`Sms provider disabled`)
 
       if (this.twil.enabled && newUser.phone) {
         const message = `Welcome ${newUser.username}! Email: ${newUser.email}, Password: ${password}.`;
@@ -62,8 +61,8 @@ class AuthService {
         throw new Error(Codes.STX0005);
       }
 
-      const accessToken = this.generateToken(
-        { userId: user.username, role: user.role },
+      const accessToken = await generateToken(
+        { userId: user.id, username: user.username, role: user.role },
         process.env.ACCESS_TOKEN_KEY,
         parseInt(process.env.ACCESS_TOKEN_EXPIRY)
       );
@@ -77,14 +76,42 @@ class AuthService {
     }
   }
 
-  async logout(accessToken) {
-    if (!accessToken) {
-      logger.error(`AuthService.logout: access token is missing`);
-      throw new Error(Codes.STX0006);
-    }
-
+  async changePassword(username, oldPassword, newPassword) {
     try {
-      const tokenData = await this.verifyToken(accessToken, process.env.ACCESS_TOKEN_KEY);
+      const user = await this.user.findOne({ where: { username } });
+      if (!user) throw new Error(Codes.STX0011);
+
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) throw new Error(Codes.STX0015);
+
+      const hashedPassword = await bcrypt.hash(newPassword, this.bcryptSaltRounds);
+      await this.user.update({ password: hashedPassword }, { where: { username: username } });
+
+      logger.info(`AuthService.changePassword: password changed successfully for user ${username}`);
+      return { username: username };
+    } catch (error) {
+      logger.error(`AuthService.changePassword: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async resetPassword(username) {
+    try {
+      const user = await this.user.findOne({ where: { username } });
+      if (!user) throw new Error(Codes.STX0011);
+      const hashPassword = await bcrypt.hash(process.env.RESETTED_PASSWORD, this.bcryptSaltRounds);
+      await this.user.update({ password: hashPassword }, { where: { username: username } });
+      logger.info(`AuthService.resetPassword: password reset successfully for user ${username}`);
+      return { username: username };
+    } catch (error) {
+      logger.error(`AuthService.resetPassword: ${error.message}`);
+      throw error;
+    }
+  }
+
+
+  async logout(accessToken, tokenData) {
+    try {
       const currentTime = Math.floor(Date.now() / 1000);
       const ttl = Math.max(tokenData.exp - currentTime, 1);
 
@@ -104,33 +131,6 @@ class AuthService {
     }
   }
 
-  async isTokenBlacklisted(token) {
-    if (process.env.REDIS_CONNECTION === "true" || process.env.REDIS_CONNECTION === true) {
-      const value = await redisCache.get(token);
-      return Boolean(value);
-    } else {
-      return nodeCache.has(token);
-    }
-  }
-
-  async verifyToken(token, secret) {
-    try {
-      const isBlacklisted = await this.isTokenBlacklisted(token);
-      if (isBlacklisted) {
-        logger.warn("Token is blacklisted");
-        throw new Error("Token is blacklisted");
-      }
-
-      return jwt.verify(token, secret);
-    } catch (error) {
-      logger.error(`AuthService.verifyToken: ${error.message}`);
-      throw error;
-    }
-  }
-
-  generateToken(payload, secret, expiresIn) {
-    return jwt.sign(payload, secret, { expiresIn });
-  }
 }
 
 export default AuthService;

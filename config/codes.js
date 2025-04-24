@@ -10,4 +10,10 @@ export const Codes = {
     STX0009: "User logout failed!",
     STX0010: "User registeration failed!",
     STX0011: "User not found!",
+    STX0012: "Token is blacklisted",
+    STX0013: "Password changed successfully!",
+    STX0014: "Error generating token!",
+    STX0015: "Old password is incorrect!",
+    STX0016: "Old password and new password are same",
+    STX0017: "You are not authorized to perform this action",
 }

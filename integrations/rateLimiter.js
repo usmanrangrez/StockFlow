@@ -6,7 +6,8 @@ const rateLimitter = rateLimit({
   max: 20,
   skipSuccessfulRequests: true,
   message: Codes.GRX0021,
-  //   legacyHeaders: false,
+  standardHeaders: false,
+  legacyHeaders: false,
   handler: (req, res, next) => {
     res.status(429).json({ error: Codes.STX0001 });
   },

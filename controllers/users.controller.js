@@ -6,6 +6,16 @@ class UserController {
         this.userService = new UserService()
     }
 
+    register = async (req, res, next) => {
+        try {
+            const { username, email, password, role, active, phone } = req.body;
+            const newUser = await this.userService.register(username, email, password, phone, role, active);
+            res.sendSuccess(201, Codes.STX0003, newUser);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     getDetails = async (req, res, next) => {
         try {
             const username = req.params.username || req.user.username;

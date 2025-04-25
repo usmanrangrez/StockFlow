@@ -2,7 +2,7 @@ import Joi from 'joi';
 import constants from '../config/constants.js';
 
 export const updateUserSchema = Joi.object({
-    phone: Joi.string().length(10).allow(null, '').optional(),
+    phone: Joi.string().length(10).pattern(constants.regex.phone).allow(null, '').optional(),
     role: Joi.string()
         .valid(
             constants.db.roles.admin,

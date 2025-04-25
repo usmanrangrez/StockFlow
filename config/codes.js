@@ -25,4 +25,10 @@ export const Codes = {
     STX0024: "Username is required",   
     STX0025: "User deleted successfully",   
     STX0026: "Cannot delete the last admin user",   
+    STX0027: "Brand created successfully",   
+    STX0028: "Brand(s) fetched successfully", 
+    STX0029: "No brands present",   
+    STX0030: "Brand not found",   
+    STX0031: "Brand updated successfully",   
+    STX0032: "Brand deleted successfully",   
 }

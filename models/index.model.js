@@ -7,12 +7,12 @@ export class BaseModel extends Model {}
 
 BaseModel.init(
   {
+    // Common fields shared by all models
     id: {
       type: DataTypes.UUIDV4,
       primaryKey: true,
       autoIncrement: true,
     },
-    // Common fields shared by all models
     createdAt: {
       type: DataTypes.DATE,
       field: constants.db.columnNames.createdAt,

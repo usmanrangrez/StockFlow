@@ -18,35 +18,6 @@ class AuthService {
     this.twil = new Twil();
   }
 
-  async register(username, email, password, phone, role, active) {
-    try {
-      const existingUser = await this.user.findOne({ where: { email } });
-      if (existingUser) {
-        logger.error(`AuthService.register: existing user with same email ${email}`);
-        throw new Error(Codes.STX0002);
-      }
-
-      const hashedPassword = await bcrypt.hash(password, this.bcryptSaltRounds);
-      const newUser = await this.user.create({ username, email, password: hashedPassword, phone, role, active });
-
-      logger.info(`AuthService.register: user registered successfully with email ${email}`);
-      if (!this.twil.enabled) logger.info(`Sms provider disabled`)
-
-      if (this.twil.enabled && newUser.phone) {
-        const message = `Welcome ${newUser.username}! Email: ${newUser.email}, Password: ${password}.`;
-        this.twil.sendSMS(`+91${newUser.phone}`, message);
-      }
-
-      const userWithoutPassword = newUser.toJSON();
-      delete userWithoutPassword.password;
-
-      return userWithoutPassword;
-    } catch (error) {
-      logger.error(`AuthService.register: ${error.message}`);
-      throw error;
-    }
-  }
-
   async login(username, password) {
     try {
       const user = await this.user.findOne({ where: { username }, raw: true });

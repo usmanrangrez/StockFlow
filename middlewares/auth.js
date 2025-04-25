@@ -55,6 +55,8 @@ export const verifyRole = (allowedRoles = [], { restrictParamAccess = false } = 
             //if the user is not an admin and is trying to access another user's data
             if (restrictParamAccess && requestedUsername && !allowedRoles.includes(userRole)) throw ForbiddenError(Codes.STX0017);
 
+            //normal check
+            if (allowedRoles.length && !allowedRoles.includes(userRole)) throw ForbiddenError(Codes.STX0017);
             next();
         } catch (error) {
             logger.error(`AuthService.verifyRole: ${error.message}`);

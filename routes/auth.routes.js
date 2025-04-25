@@ -5,11 +5,10 @@ const authController = new AuthController();
 
 import { checkActiveUser, verifyRole, verifyToken } from "../middlewares/auth.js";
 import constants from "../config/constants.js";
-import { registerSchema, loginSchema, changePasswordSchema, resetPasswordSchema } from "../schemas/auth.schemas.js";
+import { loginSchema, changePasswordSchema, resetPasswordSchema } from "../schemas/auth.schemas.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
 
 router.post("/login", validateSchema(loginSchema), checkActiveUser, authController.login)
-router.post("/register", validateSchema(registerSchema), verifyToken, checkActiveUser, authController.register)
 router.post("/changePassword", validateSchema(changePasswordSchema), verifyToken, checkActiveUser, authController.changePassword)
 router.post("/resetPassword", validateSchema(resetPasswordSchema), verifyToken, checkActiveUser, verifyRole(constants.db.adminRole), authController.resetPassword)
 router.post("/logout", verifyToken, checkActiveUser, authController.logout)

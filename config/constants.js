@@ -7,6 +7,9 @@ const constants = {
     true: "true",
     false: "false",
   },
+  regex:{
+    phone: /^[0-9]{10}$/,
+  },
   db: {
     roles: {
       admin: "admin",
@@ -26,6 +29,10 @@ const constants = {
       user: {
         modelName: "User",
         tableName: "users",
+      },
+      brands: {
+        modelName: "Brands",
+        tableName: "brands",
       },
     },
   },

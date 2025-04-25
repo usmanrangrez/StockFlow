@@ -6,16 +6,6 @@ class AuthController {
         this.authService = new AuthService()
     }
 
-    register = async (req, res, next) => {
-        try {
-            const { username, email, password, role, active, phone } = req.body;
-            const newUser = await this.authService.register(username, email, password, phone, role, active);
-            res.sendSuccess(201, Codes.STX0003, newUser);
-        } catch (error) {
-            next(error);
-        }
-    }
-
     login = async (req, res, next) => {
         try {
             const { username, password } = req.body;

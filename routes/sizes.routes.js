@@ -9,9 +9,10 @@ import { validateSchema } from "../middlewares/validateSchema.js";
 import { sizesSchema, updateSizeSchema } from "../schemas/sizes.schema.js";
 
 router.post("/", validateSchema(sizesSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, sizesController.createSize);
-router.patch("/", validateSchema(updateSizeSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, sizesController.updateSize);
+router.patch("/:sizeId", validateSchema(updateSizeSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, sizesController.updateSize);
+//get in bulk (ids in body)
 router.get("/", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, sizesController.getAllSizes);
-router.delete("/:id", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, sizesController.deleteSize);
+router.delete("/:sizeId", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, sizesController.deleteSize);
 
 
 

@@ -18,9 +18,9 @@ class ColorsController {
 
   updateColor = async (req, res, next) => {
     try {
-      const name = req.params.name;
+      const colorId = req.params.colorId;
       const body = req.body;
-      const color = await this.colorService.updateColor(name, body);
+      const color = await this.colorService.updateColor(colorId, body);
       res.sendSuccess(201, Codes.STX0041, color);
     } catch (error) {
       next(error);
@@ -29,8 +29,8 @@ class ColorsController {
 
   deleteColor = async (req, res, next) => {
     try {
-      const name = req.params.name;
-      const color = await this.colorService.deleteColor(name);
+      const colorId = req.params.colorId;
+      const color = await this.colorService.deleteColor(colorId);
       res.sendSuccess(201, Codes.STX0042, color);
     } catch (error) {
       next(error);
@@ -39,8 +39,8 @@ class ColorsController {
 
   getColors = async (req, res, next) => {
     try {
-      const colorName = req?.params?.name;
-      const color = await this.colorService.getColors(colorName);
+      const colorId = req?.params?.colorId;
+      const color = await this.colorService.getColors(colorId);
       res.sendSuccess(200, Codes.STX0043, color);
     } catch (error) {
       next(error);

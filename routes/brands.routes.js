@@ -9,9 +9,9 @@ import { validateSchema } from "../middlewares/validateSchema.js";
 import { brandsSchema, updateBrandSchema } from "../schemas/brands.schema.js";
 
 router.post("/", validateSchema(brandsSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, brandsController.createBrand);
-router.get("/{:name}", verifyToken, checkActiveUser, brandsController.getBrands);
-router.patch("/:name", validateSchema(updateBrandSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, brandsController.updateBrand);
-router.delete("/:name", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, brandsController.deleteBrand);
+router.get("/{:brandId}", verifyToken, checkActiveUser, brandsController.getBrands);
+router.patch("/:brandId", validateSchema(updateBrandSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, brandsController.updateBrand);
+router.delete("/:brandId", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, brandsController.deleteBrand);
 
 
 export default router;

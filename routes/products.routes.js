@@ -10,9 +10,9 @@ import { bulkProductSchema, productSchema, updateProductSchema} from "../schemas
 
 router.post("/", validateSchema(productSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, productsController.createProduct);
 router.post("/bulkCreate", validateSchema(bulkProductSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, productsController.createProducts);
-router.get("/{:name}", verifyToken, checkActiveUser, productsController.getProducts);
-router.delete ("/:name", verifyToken, checkActiveUser, productsController.deleteProduct);
-router.patch("/:name", validateSchema(updateProductSchema), verifyToken, checkActiveUser, productsController.updateProduct);
+router.get("/{:productId}", verifyToken, checkActiveUser, productsController.getProducts);
+router.delete ("/:productId", verifyToken, checkActiveUser, productsController.deleteProduct);
+router.patch("/:productId", validateSchema(updateProductSchema), verifyToken, checkActiveUser, productsController.updateProduct);
 
 
 

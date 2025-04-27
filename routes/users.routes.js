@@ -12,8 +12,8 @@ import { registerSchema } from "../schemas/auth.schemas.js";
 router.get("/all", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, userController.getAllUsers);
 router.post("/", validateSchema(registerSchema), verifyToken, checkActiveUser, userController.register)
 router.get("/{:username}", verifyToken, verifyRole(constants.db.adminOnly, { restrictParamAccess: true }), checkActiveUser, userController.getDetails);
-router.patch("/:username", validateSchema(updateUserSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, userController.editUser);
-router.delete("/:username", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, userController.deleteUser);
+router.patch("/:userId", validateSchema(updateUserSchema), verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, userController.editUser);
+router.delete("/:userId", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, userController.deleteUser);
 
 
 export default router;

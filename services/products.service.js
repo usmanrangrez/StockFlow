@@ -52,12 +52,12 @@ class ProductsService {
     }
   }
 
-  async getProducts(productName) {
+  async getProducts(id) {
     try {
-      if (productName) {
-        const product = await this.product.findOne({ where: { name: productName } });
+      if (id) {
+        const product = await this.product.findOne({ where: { id } });
         if (!product) {
-          logger.error(`ProductsService.getProducts: Brand with name ${productName} not found`);
+          logger.error(`ProductsService.getProducts: Brand with id ${id} not found`);
           throw new Error(Codes.STX0036);
         }
         return product;
@@ -71,32 +71,32 @@ class ProductsService {
     }
   }
 
-  async deleteProduct(productName) {
+  async deleteProduct(id) {
     try {
-      const product = await this.product.findOne({ where: { name: productName } });
+      const product = await this.product.findOne({ where: { id } });
       if (!product) {
-        logger.error(`ProductsService.deleteProduct: Product with name ${productName} not found`);
+        logger.error(`ProductsService.deleteProduct: Product with id ${id} not found`);
         throw new Error(Codes.STX0036);
       }
   
       await product.destroy();
-      return  { name: productName };
+      return  { name: product?.name };
     } catch (error) {
       logger.error(`ProductsService.deleteProduct: ${error.message}`);
       throw error;
     }
   }
 
-  async updateProduct(productName, data) {
+  async updateProduct(id, data) {
     try {
-      const product = await this.product.findOne({ where: { name: productName } });
+      const product = await this.product.findOne({ where: { id } });
       if (!product) {
-        logger.error(`ProductsService.updateProduct: Product with name ${productName} not found`);
+        logger.error(`ProductsService.updateProduct: Product with id ${id} not found`);
         throw new Error(Codes.STX0036);
       }
   
       await product.update(data);
-      return { name: productName };
+      return { name: product?.name };
     } catch (error) {
       logger.error(`ProductsService.updateProduct: ${error.message}`);
       throw error;

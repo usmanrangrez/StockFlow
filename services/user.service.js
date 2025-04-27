@@ -64,16 +64,16 @@ class UserService {
     }
   }
 
-  async editUser(username, data) {
+  async editUser(id, data) {
     try {
       const userExists = await this.user.findOne({
-        where: { username },
+        where: { id },
         raw: true,
       });
       if (!userExists) throw new Error(Codes.STX0011);
-      await this.user.update(data, { where: { username } });
+      await this.user.update(data, { where: { id } });
       const updatedUser = await this.user.findOne({
-        where: { username },
+        where: { id },
         raw: true,
       });
       delete updatedUser.password;
@@ -83,10 +83,10 @@ class UserService {
       throw error;
     }
   }
-  async deleteUser(username) {
+  async deleteUser(id) {
     try {
       const userExists = await this.user.findOne({
-        where: { username },
+        where: { id },
         raw: true,
       });
       if (!userExists) throw new Error(Codes.STX0011);
@@ -94,10 +94,9 @@ class UserService {
         where: { role: constants.db.roles.admin },
         raw: true,
       });
-      if (admins.length === 1 && admins[0].username === username)
-        throw new Error(Codes.STX0026);
-      const deletedUser = await this.user.destroy({ where: { username } });
-      return deletedUser;
+      if (admins.length === 1 && admins[0].id === id) throw new Error(Codes.STX0026);
+      await this.user.destroy({ where: { id } });
+      return { name: userExists.username };
     } catch (error) {
       logger.error(`UserService.deleteUser: ${error}`);
       throw error;

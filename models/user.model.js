@@ -13,6 +13,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+      set(value) {
+        // Trim any leading or trailing spaces before saving
+        this.setDataValue("username", value.trim());
+      },
     },
     email: {
       type: DataTypes.STRING,

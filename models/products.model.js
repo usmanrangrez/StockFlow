@@ -2,13 +2,19 @@ import { DataTypes } from "sequelize";
 import { BaseModel } from "./index.model.js";
 import { Database } from "../integrations/database.js";
 import constants from "../config/constants.js";
+import Brand from "./brands.model.js";
 
 const db = Database.getSequelize();
 
-export class Brands extends BaseModel {}
+export class Products extends BaseModel {}
 
-Brands.init(
+Products.init(
   {
+    code: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -18,21 +24,9 @@ Brands.init(
         this.setDataValue("name", value.trim());
       },
     },
-    contactPerson: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    contactEmail: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    contactPhone: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    website: {
-      type: DataTypes.STRING,
-      allowNull: true,
+    brandId: {
+      type: DataTypes.UUID,
+      allowNull: false,
     },
   },
   {
@@ -42,9 +36,16 @@ Brands.init(
     updatedAt: constants.db.columnNames.updatedAt,
     timestamps: true,
     underscored: true,
-    modelName: constants.db.modelTableMap.brands.modelName,
-    tableName: constants.db.modelTableMap.brands.tableName,
+    modelName: constants.db.modelTableMap.products.modelName,
+    tableName: constants.db.modelTableMap.products.tableName,
   }
 );
 
-export default Brands;
+Products.belongsTo(Brand, {
+  foreignKey: "brandId",
+  as: "brand",
+  onDelete: "RESTRICT",
+  onUpdate: "CASCADE",
+});
+
+export default Products;

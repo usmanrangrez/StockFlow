@@ -31,7 +31,7 @@ BaseModel.init(
     schema: process.env.AUTH_SCHEMA,
     timestamps: true,
     paranoid: true,
-    underscored: true,
+    underscored: true, // will convert camelCase to snake_case like createdAt to created_at or updatedAt to updated_at or deletedAt to deleted_at or any other field such as sizeRange to size_range
     modelName: "BaseModel",
   }
 );

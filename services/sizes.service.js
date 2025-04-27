@@ -23,16 +23,16 @@ class SizesService {
     }
   }
 
-  async updateSize(body) {
+  async updateSize(id,body) {
     try {
-      const size = await this.sizes.findOne({ where: { id: body.id } });
-      if (!size) throw new Error(`Size with id ${body.id} not found`);
+      const size = await this.sizes.findOne({ where: { id } });
+      if (!size) throw new Error(`Size with id ${id} not found`);
 
       const descendingSize = body.sizeRange.map(Number).sort((a, b) => a - b);
       const existingSize = await this.sizes.findOne({ where: { sizeRange: descendingSize } });
       if (existingSize) throw new Error(`Size with range ${body.sizeRange} already exists or a similar one is already registered`);
 
-      await this.sizes.update({ sizeRange: descendingSize }, { where: { id: body.id } });
+      await this.sizes.update({ sizeRange: descendingSize }, { where: { id: id } });
       return { size: descendingSize };
     } catch (error) {
       logger.error(`SizesService.updateSize: ${error}`);

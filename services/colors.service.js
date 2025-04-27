@@ -22,38 +22,38 @@ class ColorsService {
     }
   }
 
-  async updateColor(name, color) {
+  async updateColor(id, color) {
     try {
-      const existingColor = await this.color.findOne({ where: { name: name.trim() } });
-      if (!existingColor) throw new Error(`Color with name ${name} does not exist`);
+      const existingColor = await this.color.findOne({ where: { id } });
+      if (!existingColor) throw new Error(`Color with id ${id} does not exist`);
 
-      await this.color.update(color, { where: { name: name.trim() } });
-      return { name: name.trim() };
+      await this.color.update(color, { where: { id } });
+      return { name: existingColor.name.trim() };
     } catch (error) {
       logger.error(`ColorsService.updateColor: ${error}`);
       throw error;
     }
   }
 
-  async deleteColor(name) {
+  async deleteColor(id) {
     try {
-      const existingColor = await this.color.findOne({ where: { name: name.trim() } });
-      if (!existingColor) throw new Error(`Color with name ${name} does not exist`);
+      const existingColor = await this.color.findOne({ where: { id } });
+      if (!existingColor) throw new Error(`Color with id ${id} does not exist`);
 
-      await this.color.destroy({ where: { name: name.trim() } });
-      return { name: name.trim() };
+      await this.color.destroy({ where: { id } });
+      return { name: existingColor?.name.trim() };
     } catch (error) {
       logger.error(`ColorsService.deleteColor: ${error}`);
       throw error;
     }
   }
 
-  async getColors(colorName) {
+  async getColors(id) {
     try {
-      if (colorName) {
-        const color = await this.color.findOne({ where: { name: colorName } });
+      if (id) {
+        const color = await this.color.findOne({ where: { id } });
         if (!color) {
-          logger.error(`ColorsService.getProducts: Color with name ${color} not found`);
+          logger.error(`ColorsService.getProducts: Color with id ${id} not found`);
           throw new Error(Codes.STX0044);
         }
         return color;

@@ -18,8 +18,8 @@ class BrandsController {
 
   getBrands = async (req, res, next) => {
     try {
-      const brandName = req?.params?.name;
-      const brand = await this.brandsService.getBrand(brandName);
+      const brandId = req?.params?.brandId;
+      const brand = await this.brandsService.getBrand(brandId);
       res.sendSuccess(200, Codes.STX0028, brand);
     } catch (error) {
       next(error);
@@ -28,9 +28,9 @@ class BrandsController {
 
   updateBrand = async (req, res, next) => {
     try {
-      const brandName = req?.params?.name;
+      const brandId = req?.params?.brandId;
       const body = req.body;
-      const brand = await this.brandsService.updateBrand(brandName, body);
+      const brand = await this.brandsService.updateBrand(brandId, body);
       res.sendSuccess(201, Codes.STX0031, brand);
     } catch (error) {
       next(error);
@@ -39,8 +39,8 @@ class BrandsController {
 
   deleteBrand = async (req, res, next) => {
     try {
-      const brandName = req?.params?.name;
-      const brand = await this.brandsService.deleteBrand(brandName);
+      const brandId = req?.params?.brandId;
+      const brand = await this.brandsService.deleteBrand(brandId);
       res.sendSuccess(201, Codes.STX0032, brand);
     } catch (error) {
       next(error);

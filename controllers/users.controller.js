@@ -28,9 +28,9 @@ class UserController {
 
     editUser = async (req, res, next) => {
         try {
-            const username = req.params.username;
+            const userId = req.params.userId;
             const data = req.body;
-            const user = await this.userService.editUser(username, data);
+            const user = await this.userService.editUser(userId, data);
             res.sendSuccess(200, Codes.STX0022, user);
         } catch (error) {
             next(error);
@@ -39,8 +39,8 @@ class UserController {
 
     deleteUser = async (req, res, next) => {
         try {
-            const username = req.params.username;
-            const user = await this.userService.deleteUser(username);
+            const userId = req.params.userId;
+            const user = await this.userService.deleteUser(userId);
             res.sendSuccess(200, Codes.STX0025, user);
         } catch (error) {
             next(error);

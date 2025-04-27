@@ -18,8 +18,9 @@ class ColorsController {
 
   updateSize = async (req, res, next) => {
     try {
+      const sizeId = req.params.sizeId;
       const body = req.body;
-      const sizeRange = await this.sizesService.updateSize(body);
+      const sizeRange = await this.sizesService.updateSize(sizeId, body);
       res.sendSuccess(200, Codes.STX0047, sizeRange);
     } catch (error) {
       next(error);
@@ -38,8 +39,8 @@ class ColorsController {
 
   deleteSize = async (req, res, next) => {
     try {
-      const id = req.params.id;
-      const sizeRange = await this.sizesService.deleteSize(id);
+      const sizeId = req.params.id;
+      const sizeRange = await this.sizesService.deleteSize(sizeId);
       res.sendSuccess(200, Codes.STX0051, sizeRange);
     } catch (error) {
       next(error);

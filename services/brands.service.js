@@ -26,12 +26,12 @@ class BrandsService {
     }
   }
 
-  async getBrand(brandName) {
+  async getBrand(id) {
     try {
-      if (brandName) {
-        const brand = await this.brand.findOne({ where: { name: brandName } });
+      if (id) {
+        const brand = await this.brand.findOne({ where: { id } });
         if (!brand) {
-          logger.error(`BrandsService.getBrand: Brand with name ${brandName} not found`);
+          logger.error(`BrandsService.getBrand: Brand with id ${id} not found`);
           throw new Error(Codes.STX0030);
         }
         return brand;
@@ -45,30 +45,30 @@ class BrandsService {
     }
   }
 
-  async updateBrand(brandName, data) {
+  async updateBrand(id, data) {
     try {
-      const brand = await this.brand.findOne({ where: { name: brandName } });
+      const brand = await this.brand.findOne({ where: { id } });
       if (!brand) {
-        logger.error(`BrandsService.updateBrand: Brand with name ${brandName} not found`);
+        logger.error(`BrandsService.updateBrand: Brand with id ${id} not found`);
         throw new Error(Codes.STX0030);
       }
-      const updatedBrand = await this.brand.update(data, { where: { name: brandName } });
-      return { name: brandName };
+      await this.brand.update(data, { where: { id } });
+      return { oldName: brand?.name };
     } catch (error) {
       logger.error(`BrandsService.updateBrand: ${error}`);
       throw error;
     }
   }
 
-  async deleteBrand(brandName) {
+  async deleteBrand(id) {
     try {
-      const brand = await this.brand.findOne({ where: { name: brandName } });
+      const brand = await this.brand.findOne({ where: { id } });
       if (!brand) {
-        logger.error(`BrandsService.deleteBrand: Brand with name ${brandName} not found`);
+        logger.error(`BrandsService.deleteBrand: Brand with id ${id} not found`);
         throw new Error(Codes.STX0030);
       }
-      await this.brand.destroy({ where: { name: brandName } });
-      return { name: brandName };
+      await this.brand.destroy({ where: { id } });
+      return { name: brand?.name };
     } catch (error) {
       logger.error(`BrandsService.deleteBrand: ${error}`);
       throw error;

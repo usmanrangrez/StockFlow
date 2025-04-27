@@ -5,6 +5,5 @@ export const sizesSchema = Joi.object({
 });
 
 export const updateSizeSchema = Joi.object({
-  id: Joi.string().required(),
   sizeRange: Joi.array().items(Joi.number()).required()
 });

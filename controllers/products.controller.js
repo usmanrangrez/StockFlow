@@ -28,8 +28,8 @@ class ProductsController {
 
   getProducts = async (req, res, next) => {
     try {
-      const name = req?.params?.name;
-      const products = await this.productsService.getProducts(name);
+      const productId = req?.params?.productId;
+      const products = await this.productsService.getProducts(productId);
       res.sendSuccess(200, Codes.STX0035, products);
     } catch (error) {
       next(error);
@@ -38,8 +38,8 @@ class ProductsController {
 
   deleteProduct = async (req, res, next) => {
     try {
-      const name = req.params.name;
-      const product = await this.productsService.deleteProduct(name);
+      const productId = req.params.productId;
+      const product = await this.productsService.deleteProduct(productId);
       res.sendSuccess(201, Codes.STX0038, product);
     } catch (error) {
       next(error);
@@ -48,9 +48,9 @@ class ProductsController {
 
   updateProduct = async (req, res, next) => {
     try {
-      const name = req.params.name;
+      const productId = req.params.productId;
       const body = req.body;
-      const product = await this.productsService.updateProduct(name, body);
+      const product = await this.productsService.updateProduct(productId, body);
       res.sendSuccess(201, Codes.STX0039, product);
     } catch (error) {
       next(error);

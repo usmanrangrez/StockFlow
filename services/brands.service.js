@@ -11,9 +11,7 @@ class BrandsService {
 
   async createBrand(brandData) {
     try {
-      const isBrandExists = await this.brand.findOne({
-        where: { name: brandData.name },
-      });
+      const isBrandExists = await this.brand.findOne({ where: { name: brandData.name } });
       if (isBrandExists) {
         logger.error(
           `BrandsService.createBrand: Brand with name ${brandData.name} already exists`
@@ -23,7 +21,7 @@ class BrandsService {
       const brand = await this.brand.create(brandData);
       return brand;
     } catch (error) {
-      logger.error(`BrandsService.createBrand: ${error.message}`);
+      logger.error(`BrandsService.createBrand: ${error}`);
       throw error;
     }
   }
@@ -42,7 +40,7 @@ class BrandsService {
       if (brands.count === 0 || !brands.rows.length) throw new Error(Codes.STX0029);
       return brands;
     } catch (error) {
-      logger.error(`BrandsService.getBrand: ${error.message}`);
+      logger.error(`BrandsService.getBrand: ${error}`);
       throw error;
     }
   }
@@ -57,7 +55,7 @@ class BrandsService {
       const updatedBrand = await this.brand.update(data, { where: { name: brandName } });
       return { name: brandName };
     } catch (error) {
-      logger.error(`BrandsService.updateBrand: ${error.message}`);
+      logger.error(`BrandsService.updateBrand: ${error}`);
       throw error;
     }
   }
@@ -72,7 +70,7 @@ class BrandsService {
       await this.brand.destroy({ where: { name: brandName } });
       return { name: brandName };
     } catch (error) {
-      logger.error(`BrandsService.deleteBrand: ${error.message}`);
+      logger.error(`BrandsService.deleteBrand: ${error}`);
       throw error;
     }
   }

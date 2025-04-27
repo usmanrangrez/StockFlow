@@ -44,7 +44,7 @@ class UserService {
 
       return userWithoutPassword;
     } catch (error) {
-      logger.error(`UserService.register: ${error.message}`);
+      logger.error(`UserService.register: ${error}`);
       throw error;
     }
   }
@@ -59,7 +59,7 @@ class UserService {
       delete userExists.password;
       return userExists;
     } catch (error) {
-      logger.error(`UserService.getDetails: ${error.message}`);
+      logger.error(`UserService.getDetails: ${error}`);
       throw error;
     }
   }
@@ -79,7 +79,7 @@ class UserService {
       delete updatedUser.password;
       return updatedUser;
     } catch (error) {
-      logger.error(`UserService.editUser: ${error.message}`);
+      logger.error(`UserService.editUser: ${error}`);
       throw error;
     }
   }
@@ -99,7 +99,7 @@ class UserService {
       const deletedUser = await this.user.destroy({ where: { username } });
       return deletedUser;
     } catch (error) {
-      logger.error(`UserService.deleteUser: ${error.message}`);
+      logger.error(`UserService.deleteUser: ${error}`);
       throw error;
     }
   }
@@ -110,7 +110,7 @@ class UserService {
       if (users.count === 0 || !users.rows.length) throw new Error(Codes.STX0020);
       return users;
     } catch (error) {
-      logger.error(`UserService.getAllUsers: ${error.message}`);
+      logger.error(`UserService.getAllUsers: ${error}`);
       throw error;
     }
   }

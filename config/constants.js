@@ -9,12 +9,19 @@ const constants = {
   },
   regex:{
     phone: /^[0-9]{10}$/,
+    lettersCumNumbers: /^[a-zA-Z0-9]+$/,
   },
   db: {
     roles: {
       admin: "admin",
       manager: "manager",
       staff: "staff",
+    },
+    locations: {
+      groundFloor: "ground_floor",
+      firstFloor: "first_floor",
+      secondFloor: "second_floor",
+      shed: "shed",
     },
     adminCumManager: ["admin", "manager"],
     resetPasswordRoles: ["admin"],
@@ -33,6 +40,26 @@ const constants = {
       brands: {
         modelName: "Brands",
         tableName: "brands",
+      },
+      products: {
+        modelName: "Products",
+        tableName: "products",
+      },
+      productsVariants: {
+        modelName: "ProductsVariants",
+        tableName: "products_variants",
+      },
+      sizes:{
+        modelName: "Sizes",
+        tableName: "sizes",
+      },
+      colors:{
+        modelName: "Colors",
+        tableName: "colors",
+      },
+      cartons:{
+        modelName: "Cartons",
+        tableName: "cartons",
       },
     },
   },

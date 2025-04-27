@@ -43,7 +43,7 @@ class AuthService {
 
       return { user, accessToken };
     } catch (error) {
-      logger.error(`AuthService.login: ${error.message}`);
+      logger.error(`AuthService.login: ${error}`);
       throw error;
     }
   }
@@ -62,7 +62,7 @@ class AuthService {
       logger.info(`AuthService.changePassword: password changed successfully for user ${username}`);
       return { username: username };
     } catch (error) {
-      logger.error(`AuthService.changePassword: ${error.message}`);
+      logger.error(`AuthService.changePassword: ${error}`);
       throw error;
     }
   }
@@ -76,7 +76,7 @@ class AuthService {
       logger.info(`AuthService.resetPassword: password reset successfully for user ${username}`);
       return { username: username };
     } catch (error) {
-      logger.error(`AuthService.resetPassword: ${error.message}`);
+      logger.error(`AuthService.resetPassword: ${error}`);
       throw error;
     }
   }
@@ -98,7 +98,7 @@ class AuthService {
       logger.info(`AuthService.logout: Token blacklisted for ${ttl}s`);
       return tokenData;
     } catch (error) {
-      logger.error(`AuthService.logout: ${error.message}`);
+      logger.error(`AuthService.logout: ${error}`);
       throw error;
     }
   }

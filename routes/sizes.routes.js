@@ -15,6 +15,4 @@ router.get("/", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser
 router.delete("/:sizeId", verifyToken, verifyRole(constants.db.adminOnly), checkActiveUser, sizesController.deleteSize);
 
 
-
-
 export default router;

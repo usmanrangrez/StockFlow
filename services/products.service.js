@@ -52,7 +52,7 @@ class ProductsService {
     }
   }
 
-  async getProducts(id) {
+  async getProducts(id,limit,offset) {
     try {
       if (id) {
         const product = await this.product.findOne({ where: { id } });
@@ -62,8 +62,8 @@ class ProductsService {
         }
         return product;
       }
-      const products = await this.product.findAndCountAll();
-      if (products.count === 0 || !products.rows.length) throw new Error(Codes.STX0037);
+      const products = await this.product.findAndCountAll({ limit, offset });
+      // if (products.count === 0 || !products.rows.length) throw new Error(Codes.STX0037);
       return products;
     } catch (error) {
       logger.error(`ProductsService.getProducts: ${error.message}`);
@@ -102,7 +102,6 @@ class ProductsService {
       throw error;
     }
   }
-  
 
 }
 

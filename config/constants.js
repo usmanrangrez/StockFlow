@@ -7,7 +7,7 @@ const constants = {
     true: "true",
     false: "false",
   },
-  regex:{
+  regex: {
     phone: /^[0-9]{10}$/,
     lettersCumNumbers: /^[a-zA-Z0-9]+$/,
   },
@@ -23,9 +23,21 @@ const constants = {
       secondFloor: "second_floor",
       shed: "shed",
     },
-    operations:{
+    operations: {
       increase: "increase",
       decrease: "decrease",
+    },
+    districts: {
+      SRINAGAR: "Srinagar",
+      BARAMULLA: "Baramulla",
+      ANANTNAG: "Anantnag",
+      PULWAMA: "Pulwama",
+      KUPWARA: "Kupwara",
+      BUDGAM: "Budgam",
+      BANDIPORA: "Bandipora",
+      GANDERBAL: "Ganderbal",
+      SHOPIAN: "Shopian",
+      KULGAM: "Kulgam",
     },
     adminCumManager: ["admin", "manager"],
     resetPasswordRoles: ["admin"],
@@ -53,18 +65,26 @@ const constants = {
         modelName: "ProductsVariants",
         tableName: "products_variants",
       },
-      sizes:{
+      sizes: {
         modelName: "Sizes",
         tableName: "sizes",
       },
-      colors:{
+      colors: {
         modelName: "Colors",
         tableName: "colors",
       },
-      cartons:{
+      cartons: {
         modelName: "Cartons",
         tableName: "cartons",
       },
+      customers: {
+        modelName: "Customers",
+        tableName: "customers",
+      },
+      sales:{
+        modelName: "Sales",
+        tableName: "sales",
+      }
     },
   },
 };

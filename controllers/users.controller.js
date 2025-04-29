@@ -1,4 +1,5 @@
 import { Codes } from "../config/codes.js";
+import { getPaginationParams } from "../helpers/getPagination.helper.js";
 import UserService from "../services/user.service.js";
 
 class UserController {
@@ -49,7 +50,8 @@ class UserController {
 
     getAllUsers = async (req, res, next) => {
         try {
-            const users = await this.userService.getAllUsers();
+            let { limit = 10, offset = 0} = getPaginationParams(req)
+            const users = await this.userService.getAllUsers(limit, offset);
             res.sendSuccess(200, Codes.STX0019, users);
         } catch (error) {
             next(error);

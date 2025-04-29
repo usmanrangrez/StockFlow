@@ -48,7 +48,7 @@ class ColorsService {
     }
   }
 
-  async getColors(id) {
+  async getColors(id,limit,offset) {
     try {
       if (id) {
         const color = await this.color.findOne({ where: { id } });
@@ -58,8 +58,8 @@ class ColorsService {
         }
         return color;
       }
-      const colors = await this.color.findAndCountAll();
-      if (colors.count === 0 || !colors.rows.length) throw new Error(Codes.STX0045);
+      const colors = await this.color.findAndCountAll({ limit, offset });
+      // if (colors.count === 0 || !colors.rows.length) throw new Error(Codes.STX0045);
       return colors;
     } catch (error) {
       logger.error(`ColorsService.getProducts: ${error.message}`);

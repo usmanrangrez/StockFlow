@@ -26,7 +26,7 @@ class BrandsService {
     }
   }
 
-  async getBrand(id) {
+  async getBrand(id,limit,offset) {
     try {
       if (id) {
         const brand = await this.brand.findOne({ where: { id } });
@@ -36,8 +36,8 @@ class BrandsService {
         }
         return brand;
       }
-      const brands = await this.brand.findAndCountAll();
-      if (brands.count === 0 || !brands.rows.length) throw new Error(Codes.STX0029);
+      const brands = await this.brand.findAndCountAll({ limit, offset });
+      // if (brands.count === 0 || !brands.rows.length) throw new Error(Codes.STX0029);
       return brands;
     } catch (error) {
       logger.error(`BrandsService.getBrand: ${error}`);

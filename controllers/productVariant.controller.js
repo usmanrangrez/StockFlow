@@ -1,4 +1,5 @@
 import { Codes } from "../config/codes.js";
+import { getPaginationParams } from "../helpers/getPagination.helper.js";
 import ProductsVariantsService from "../services/productsVariant.service.js";
 
 class ProductsVariantsController {
@@ -29,8 +30,9 @@ class ProductsVariantsController {
 
   getVariants = async (req, res, next) => {
     try {
+      let { limit = 10, offset = 0} = getPaginationParams(req)
       const variantId = req?.params?.variantId;
-      const productVariant = await this.productsVariantsService.getVariants(variantId);
+      const productVariant = await this.productsVariantsService.getVariants(variantId,limit,offset);
       res.sendSuccess(200, Codes.STX0056, productVariant);
     } catch (error) {
       next(error);

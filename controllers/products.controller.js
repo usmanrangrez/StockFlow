@@ -1,4 +1,5 @@
 import { Codes } from "../config/codes.js";
+import { getPaginationParams } from "../helpers/getPagination.helper.js";
 import ProductsService from "../services/products.service.js";
 
 class ProductsController {
@@ -28,8 +29,9 @@ class ProductsController {
 
   getProducts = async (req, res, next) => {
     try {
+      let { limit = 10, offset = 0} = getPaginationParams(req)
       const productId = req?.params?.productId;
-      const products = await this.productsService.getProducts(productId);
+      const products = await this.productsService.getProducts(productId,limit,offset);
       res.sendSuccess(200, Codes.STX0035, products);
     } catch (error) {
       next(error);

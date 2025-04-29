@@ -44,15 +44,15 @@ class ProductVariantsService {
     }
   }
   
-  async getVariants(id) {
+  async getVariants(id,limit,offset) {
     try {
       if (id) {
         const variants = await this.productVariants.findAll({ where: { id } });
         if (!variants.length) throw new Error(Codes.STX0058);
         return variants;
       }
-      const variants = await this.productVariants.findAndCountAll();
-      if(variants.count === 0 || !variants.rows.length) throw new Error(Codes.STX0057);
+      const variants = await this.productVariants.findAndCountAll({ limit, offset });
+      // if(variants.count === 0 || !variants.rows.length) throw new Error(Codes.STX0057);
       return variants;
     } catch (error) {
       logger.error(`ProductVariantsService.getAllSizes: ${error}`);
@@ -69,6 +69,21 @@ class ProductVariantsService {
       return { id };
     } catch (error) {
       logger.error(`ProductVariantsService.deleteSize: ${error}`);
+      throw error;
+    }
+  }
+
+
+  async getProductVariantIdFromCombination(productId,colorId,sizeRangeId) {
+    try {
+      const productVariant = await this.productVariants.findOne({ where: { productId, colorId, sizeRangeId } });
+      if (!productVariant) {
+        logger.error(`ProductsService.getProductVariantIdFromCombination: Variant with productId ${productId}, colorId ${colorId} and sizeRangeId ${sizeRangeId} not found`);
+        throw new Error(Codes.STX0057);
+      }
+      return productVariant;
+    } catch (error) {
+      logger.error(`ProductsService.getProductVariantIdFromCombination: ${error.message}`);
       throw error;
     }
   }

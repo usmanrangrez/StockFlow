@@ -52,4 +52,4 @@ export const updateProductSchema = Joi.object({
     .optional()
     .allow(null, ""),
   brandId: Joi.string().strict().optional().allow(null, ""),
-});
+}).min(1);

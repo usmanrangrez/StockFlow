@@ -15,4 +15,4 @@ export const updateBrandSchema = Joi.object({
   contactEmail: Joi.string().email().optional().allow(null, ''),
   contactPhone: Joi.string().length(10).pattern(constants.regex.phone).optional().allow(null, ''),
   website: Joi.string().uri().optional().allow(null, ''),
-});
+}).min(1);

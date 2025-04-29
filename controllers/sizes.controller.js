@@ -1,7 +1,7 @@
 import { Codes } from "../config/codes.js";
 import SizesService from "../services/sizes.service.js";
 
-class ColorsController {
+class SizesController {
   constructor() {
     this.sizesService = new SizesService();
   }
@@ -50,4 +50,4 @@ class ColorsController {
   
 }
 
-export default ColorsController;
+export default SizesController;

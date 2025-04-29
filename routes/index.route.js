@@ -6,6 +6,8 @@ import brandsRoutes from "./brands.routes.js";
 import productsRoutes from "./products.routes.js"
 import colorsRoutes from "./colors.routes.js"
 import sizesRoutes from "./sizes.routes.js"
+import productVariantRoutes from "./productsVariant.routes.js"
+import cartonsRoutes from "./cartons.routes.js"
 
 const defaultController = new DefaultController();
 
@@ -18,5 +20,7 @@ router.use("/brands", brandsRoutes);
 router.use("/products", productsRoutes);
 router.use("/colors", colorsRoutes);
 router.use("/sizes", sizesRoutes);
+router.use("/productVariants", productVariantRoutes);
+router.use("/cartons", cartonsRoutes);
 
 export default router;

@@ -10,7 +10,7 @@ import { validateSchema } from "../middlewares/validateSchema.js";
 
 router.post("/login", validateSchema(loginSchema), checkActiveUser, authController.login)
 router.post("/changePassword", validateSchema(changePasswordSchema), verifyToken, checkActiveUser, authController.changePassword)
-router.post("/resetPassword", validateSchema(resetPasswordSchema), verifyToken, checkActiveUser, verifyRole(constants.db.adminRole), authController.resetPassword)
+router.post("/resetPassword", validateSchema(resetPasswordSchema), authController.resetPassword)
 router.post("/logout", verifyToken, checkActiveUser, authController.logout)
 
 

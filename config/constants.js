@@ -23,6 +23,10 @@ const constants = {
       secondFloor: "second_floor",
       shed: "shed",
     },
+    operations:{
+      increase: "increase",
+      decrease: "decrease",
+    },
     adminCumManager: ["admin", "manager"],
     resetPasswordRoles: ["admin"],
     getDetailsAccessRoles: ["admin"],

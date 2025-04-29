@@ -7,4 +7,4 @@ export const colorsSchema = Joi.object({
 
 export const updateColorSchema = Joi.object({
   name: Joi.string().trim().optional().required(null, ''),
-});
+}).min(1);

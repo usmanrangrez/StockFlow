@@ -11,4 +11,4 @@ export const updateUserSchema = Joi.object({
         )
         .allow(null, '').optional(),
     active: Joi.boolean().allow(null, '').optional(),
-});
+}).min(1);

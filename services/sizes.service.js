@@ -40,7 +40,7 @@ class SizesService {
     }
   } 
 
-  async getAllSizes(body) {
+  async getAllSizes(body,limit,offset) {
     try {
       if(body?.ids) {
         const ids = body.ids?.map((item) => item);
@@ -48,8 +48,8 @@ class SizesService {
         if (!sizes.length) throw new Error(Codes.STX0050);
         return sizes;
       }
-      const sizes = await this.sizes.findAll();
-      if (!sizes.length) throw new Error(Codes.STX0049);
+      const sizes = await this.sizes.findAll({ limit, offset });
+      // if (!sizes.length) throw new Error(Codes.STX0049);
       return sizes;
     } catch (error) {
       logger.error(`SizesService.getAllSizes: ${error}`);

@@ -1,5 +1,6 @@
 import { Codes } from "../config/codes.js";
 import constants from "../config/constants.js";
+import { getPaginationParams } from "../helpers/getPagination.helper.js";
 import CartonsService from "../services/cartons.service.js";
 
 class CartonsController {
@@ -43,9 +44,8 @@ class CartonsController {
 
   getAllCartons = async (req, res, next) => {
     try {
-      let { limit = 10, offset = 0, location, productName } = req.query;
-      limit = parseInt(limit, 10);
-      offset = parseInt(offset, 10);
+      let { limit = 10, offset = 0} = getPaginationParams(req);
+      let { location, productName } = req.query;
       productName = productName?.trim();
       const cartons = await this.cartonsService.getAllCartons(limit, offset, location, productName);
       res.sendSuccess(200, Codes.STX0068, cartons);

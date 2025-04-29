@@ -1,4 +1,5 @@
 import { Codes } from "../config/codes.js";
+import { getPaginationParams } from "../helpers/getPagination.helper.js";
 import ColorsService from "../services/colors.service.js";
 
 class ColorsController {
@@ -39,8 +40,9 @@ class ColorsController {
 
   getColors = async (req, res, next) => {
     try {
+      let { limit = 10, offset = 0} = getPaginationParams(req);
       const colorId = req?.params?.colorId;
-      const color = await this.colorService.getColors(colorId);
+      const color = await this.colorService.getColors(colorId,limit,offset);
       res.sendSuccess(200, Codes.STX0043, color);
     } catch (error) {
       next(error);

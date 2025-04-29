@@ -157,7 +157,7 @@ class CartonsService {
         raw: true,
       });
 
-      if (!cartons.rows.length) throw new Error(Codes.STX0069);
+      // if (!cartons.rows.length) throw new Error(Codes.STX0069);
 
       const cleanedRows = cartons.rows.map((row) => {
         const cleanRow = {
@@ -182,6 +182,8 @@ class CartonsService {
       throw error;
     }
   }
+
+
 }
 
 export default CartonsService;

@@ -1,4 +1,5 @@
 import { Codes } from "../config/codes.js";
+import { getPaginationParams } from "../helpers/getPagination.helper.js";
 import SizesService from "../services/sizes.service.js";
 
 class SizesController {
@@ -29,8 +30,9 @@ class SizesController {
 
   getAllSizes = async (req, res, next) => {
     try {
+      let { limit = 10, offset = 0} = getPaginationParams(req)
       const body = req.body;
-      const sizeRanges = await this.sizesService.getAllSizes(body);
+      const sizeRanges = await this.sizesService.getAllSizes(body,limit,offset);
       res.sendSuccess(200, Codes.STX0048, sizeRanges);
     } catch (error) {
       next(error);

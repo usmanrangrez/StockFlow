@@ -103,10 +103,10 @@ class UserService {
     }
   }
 
-  async getAllUsers() {
+  async getAllUsers(limit, offset) {
     try {
-      const users = await this.user.findAndCountAll({ raw: true });
-      if (users.count === 0 || !users.rows.length) throw new Error(Codes.STX0020);
+      const users = await this.user.findAndCountAll({ raw: true, limit, offset });
+      // if (users.count === 0 || !users.rows.length) throw new Error(Codes.STX0020);
       return users;
     } catch (error) {
       logger.error(`UserService.getAllUsers: ${error}`);

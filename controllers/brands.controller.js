@@ -1,4 +1,5 @@
 import { Codes } from "../config/codes.js";
+import { getPaginationParams } from "../helpers/getPagination.helper.js";
 import BrandsService from "../services/brands.service.js";
 
 class BrandsController {
@@ -18,8 +19,9 @@ class BrandsController {
 
   getBrands = async (req, res, next) => {
     try {
+      let { limit, offset } = getPaginationParams(req);
       const brandId = req?.params?.brandId;
-      const brand = await this.brandsService.getBrand(brandId);
+      const brand = await this.brandsService.getBrand(brandId,limit,offset);
       res.sendSuccess(200, Codes.STX0028, brand);
     } catch (error) {
       next(error);

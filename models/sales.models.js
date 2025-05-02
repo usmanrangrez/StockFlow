@@ -30,6 +30,11 @@ Sales.init(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    discountPercentage: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0,
+    },
     totalSellingPrice: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,

@@ -1,4 +1,3 @@
-// Import necessary modules
 import { Op } from "sequelize";
 import { Logger } from "../integrations/winston.js";
 import { Codes } from "../config/codes.js";
@@ -10,8 +9,9 @@ import Products from "../models/products.model.js";
 import ProductVariants from "../models/productVariants.model.js";
 import Colors from "../models/colors.model.js";
 import Sizes from "../models/sizes.model.js";
-const logger = new Logger();
+import { buildDateClause } from "../helpers/dateClause.helper.js";
 
+const logger = new Logger();
 const sequelize = Database.getSequelize();
 
 class SalesService {
@@ -19,6 +19,12 @@ class SalesService {
     this.sales = Sales;
     this.cartons = Cartons;
     this.productVariantsService = new ProductVariantsService();
+  }
+
+  // Function to calculate the price based on MRP, discount, and quantity
+  calculatePrice(mrp, discountPercentage, quantity, pairsPerCarton) {
+    const rate = mrp - (mrp * discountPercentage / 100);
+    return rate * quantity * pairsPerCarton;
   }
 
   // Function to check if all sales are for the same customer
@@ -58,15 +64,16 @@ class SalesService {
   }
 
   // Function to process each sale and update inventory
-  async processSale(sale, t, affectedVariants,user) {
+  async processSale(sale, t, affectedVariants, user) {
     const {
       productId,
       colorId,
       sizeRangeId,
       customerId,
       quantity,
-      totalSellingPrice,
+      discountPercentage,
     } = sale;
+
     const productVariant =
       await this.productVariantsService.getProductVariantIdFromCombination(
         productId,
@@ -86,8 +93,6 @@ class SalesService {
     for (const carton of cartons) {
       if (remainingQuantity <= 0) break;
 
-      // explanation: if remainingQuantity is greater than carton quantity, then all cartons will be used
-      // if remainingQuantity is less than carton quantity, then only that much cartons will be used
       const newQty = Math.max(0, carton.quantity - remainingQuantity);
       const usedQty = Math.min(carton.quantity, remainingQuantity);
 
@@ -102,7 +107,17 @@ class SalesService {
       remainingQuantity -= usedQty;
     }
 
-    const totalMrp = productVariant.mrp * quantity;
+    // Fetch pairsPerCarton (use the first carton since all have the same pairsPerCarton)
+    const carton = cartons[0];
+    if (!carton) throw new Error("Carton data not found for product variant");
+
+    const totalMrp = productVariant.mrp * quantity * carton.pairsPerCarton;
+    const totalSellingPrice = this.calculatePrice(
+      productVariant.mrp,
+      discountPercentage,
+      quantity,
+      carton.pairsPerCarton
+    );
 
     // Create sale record
     return this.sales.create(
@@ -112,7 +127,8 @@ class SalesService {
         quantity,
         soldBy: user.userId,
         totalMrp,
-        totalSellingPrice,
+        discountPercentage,
+        totalSellingPrice, // Still store the calculated totalSellingPrice for record-keeping
       },
       { transaction: t }
     );
@@ -182,15 +198,12 @@ class SalesService {
 
       // Process each sale and create sale records
       for (const sale of body) {
-        const saleRecord = await this.processSale(sale, t, affectedVariants,user);
+        const saleRecord = await this.processSale(sale, t, affectedVariants, user);
         saleRecords.push(saleRecord);
       }
 
       // Build inventory summary
-      const inventorySummary = await this.buildInventorySummary(
-        affectedVariants,
-        t
-      );
+      const inventorySummary = await this.buildInventorySummary(affectedVariants, t);
 
       await t.commit();
 
@@ -206,20 +219,23 @@ class SalesService {
     }
   }
 
-  async getSales(limit, offset, customerId, productVariantId) {
+  async getSales(limit, offset, startDate, endDate ,customerId, productVariantId) {
     const whereClause = {};
     if (customerId) whereClause.customerId = customerId;
     if (productVariantId) whereClause.productVariantId = productVariantId;
+    const dateClause = buildDateClause(startDate, endDate);
+    if (dateClause) whereClause.created_at = dateClause;
+    
     const sales = await this.sales.findAndCountAll({
       include: [
         {
           model: ProductVariants,
-          attributes: ["productId", "colorId", "sizeRangeId"],
+          attributes: ["productId", "colorId", "sizeRangeId", "mrp"],
           as: "variant",
           include: [
-            { model: Products, attributes: ["name"], as: "product",required:true },
-            { model: Colors, attributes: ["name"], as: "color",required:true },
-            { model: Sizes, attributes: ["sizeRange"], as: "sizeRange",required:true },
+            { model: Products, attributes: ["name"], as: "product", required: true },
+            { model: Colors, attributes: ["name"], as: "color", required: true },
+            { model: Sizes, attributes: ["sizeRange"], as: "sizeRange", required: true },
           ],
         },
       ],
@@ -240,51 +256,87 @@ class SalesService {
         },
       };
     });
-    
+
     return { count: sales.count, rows: cleanedRows };
   }
+
   async updateSale(saleId, body) {
     const t = await sequelize.transaction();
     try {
-      const sale = await this.sales.findByPk(saleId);
-      if (!sale) throw new Error(Codes.STX0079);
-  
-      const updatedSale = await this.sales.update(body, {
-        where: { id: saleId },
+      const sale = await this.sales.findByPk(saleId, {
+        include: [
+          {
+            model: ProductVariants,
+            as: "variant",
+            include: [
+              { model: Cartons, as: "cartons" },
+            ],
+          },
+        ],
         transaction: t,
-        returning: true,
       });
-  
+      if (!sale) throw new Error(Codes.STX0079);
+
+      const { quantity, discountPercentage } = body;
+
+      // Recalculate totalSellingPrice if discountPercentage or quantity changes
+      let newTotalSellingPrice = sale.totalSellingPrice;
+      if (quantity !== undefined || discountPercentage !== undefined) {
+        const carton = sale.variant.cartons[0]; // Assume first carton for pairsPerCarton
+        if (!carton) throw new Error("No cartons found for this variant");
+
+        const newQuantity = quantity !== undefined ? quantity : sale.quantity;
+        const newDiscountPercentage = discountPercentage !== undefined ? discountPercentage : sale.discountPercentage;
+        newTotalSellingPrice = this.calculatePrice(
+          sale.variant.mrp,
+          newDiscountPercentage,
+          newQuantity,
+          carton.pairsPerCarton
+        );
+      }
+
+      const updatedSale = await this.sales.update(
+        {
+          ...body,
+          totalSellingPrice: newTotalSellingPrice,
+        },
+        {
+          where: { id: saleId },
+          transaction: t,
+          returning: true,
+        }
+      );
+
       const oldQuantity = sale.quantity;
-      const newQuantity = body.quantity;
-  
+      const newQuantity = quantity !== undefined ? quantity : oldQuantity;
+
       if (oldQuantity !== newQuantity) {
         const diff = Math.abs(oldQuantity - newQuantity);
-  
+
         const cartons = await this.cartons.findAll({
           where: { variantId: sale.productVariantId },
           transaction: t,
-          raw:true
+          raw: true,
         });
-  
+
         if (!cartons.length) throw new Error("No cartons found for this variant");
-  
+
         const totalAvailable = cartons.reduce(
           (sum, carton) => sum + carton.quantity,
           0
         );
-  
+
         if (newQuantity > oldQuantity && totalAvailable < diff) {
           throw new Error(
             `Insufficient inventory for product variant ${sale.productVariantId}. Available: ${totalAvailable}, Requested: ${diff}`
           );
         }
-  
+
         if (oldQuantity > newQuantity) {
           // Sale reduced ⇒ restock ⇒ increment cartons at lowest quantity location
           const sorted = cartons.sort((a, b) => a.quantity - b.quantity);
           const targetLocation = sorted[0].location;
-  
+
           await this.cartons.increment("quantity", {
             by: diff,
             where: {
@@ -293,11 +345,11 @@ class SalesService {
             },
             transaction: t,
           });
-        } else {
+        } else if (newQuantity > oldQuantity) {
           // Sale increased ⇒ more stock sold ⇒ decrement cartons from highest quantity first
           let remaining = diff;
           const sorted = cartons.sort((a, b) => b.quantity - a.quantity);
-  
+
           for (const carton of sorted) {
             if (remaining <= 0) break;
             const deduct = Math.min(carton.quantity, remaining);
@@ -311,7 +363,7 @@ class SalesService {
             });
             remaining -= deduct;
           }
-  
+
           if (remaining > 0) {
             throw new Error(
               `Unexpected inventory shortfall. Could not decrement full amount: ${diff}, remaining: ${remaining}`
@@ -319,7 +371,7 @@ class SalesService {
           }
         }
       }
-  
+
       await t.commit();
       return { note: Codes.STX0080, sale: updatedSale[1][0] };
     } catch (error) {
@@ -336,16 +388,16 @@ class SalesService {
       if (!sale) throw new Error(Codes.STX0079);
       await sale.destroy();
 
-      //now add back stock
+      // Now add back stock
       const cartons = await this.cartons.findAll({
         where: { variantId: sale.productVariantId },
-        raw:true,
+        raw: true,
         order: [["quantity", "DESC"]],
         transaction: t,
       });
-  
+
       if (!cartons.length || cartons.length === 0) throw new Error("No cartons found for this variant");
-      
+
       const targetLocation = cartons[0].location;
       await this.cartons.increment("quantity", {
         by: sale.quantity,
@@ -357,14 +409,13 @@ class SalesService {
       });
 
       await t.commit();
-      return { note: `${Codes.STX0082},You are requested to add a carton to location ${targetLocation}`, };
+      return { note: `${Codes.STX0082}, You are requested to add a carton to location ${targetLocation}` };
     } catch (error) {
       await t.rollback();
       logger.error(`SalesService.deleteSale Error: ${error.message}`, error);
       throw error;
     }
   }
-  
 }
 
 export default SalesService;

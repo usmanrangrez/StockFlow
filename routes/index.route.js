@@ -10,6 +10,8 @@ import productVariantRoutes from "./productsVariant.routes.js"
 import cartonsRoutes from "./cartons.routes.js"
 import customerRoutes from "./customer.routes.js"
 import salesRoutes from "./sales.routes.js"
+import generalRoutes from "./general.routes.js"
+import billsRoutes from "./bills.routes.js"
 
 const defaultController = new DefaultController();
 
@@ -26,5 +28,7 @@ router.use("/productVariants", productVariantRoutes);
 router.use("/cartons", cartonsRoutes);
 router.use("/customer", customerRoutes);
 router.use("/sales", salesRoutes);
+router.use("/dropdowns", generalRoutes);
+router.use("/bills", billsRoutes);
 
 export default router;

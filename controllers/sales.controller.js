@@ -25,7 +25,8 @@ class SalesController {
     try {
       const { customerId, productVariantId } = req.query;
       let { limit, offset } = getPaginationParams(req);
-      const sales = await this.salesService.getSales(limit, offset, customerId, productVariantId);
+      const { startDate, endDate } = req.query;
+      const sales = await this.salesService.getSales(limit, offset, startDate, endDate, customerId, productVariantId);
       res.sendSuccess(200, Codes.STX0077, sales);
     } catch (error) {
       next(error);

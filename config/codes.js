@@ -71,7 +71,7 @@ export const Codes = {
   STX0070: "Customer created successfully",
   STX0071: "Customers fetched successfully",
   STX0072: "Customer updated successfully",
-  STX0073: "No customers found",
+  STX0073: "No customer found",
   STX0074: "Customer deleted successfully",
   STX0075: "Sale registered successfully",
   STX0076: "Please make sure all sales are for the same customer",
@@ -82,4 +82,8 @@ export const Codes = {
   STX0081: "If you have enetered sales in bulk then please check latest stock availability at different locations and update the godown stock accordingly",
   STX0082: "Since you have deleted sales manually, please check latest stock availability at different locations and update the godown stock accordingly",
   STX0083: "Sale deleted successfully",
+  STX0084: "All dropdown data fetched successfully",
+  STX0085: "Bill generated successfully",
+  STX0086: "Cusomer not found",
+
 };

@@ -8,7 +8,10 @@ import constants from "../config/constants.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
 import { salesSchema, updateSaleSchema } from "../schemas/sales.schema.js";
 
-//bulk create sales in one go or create a single sale (note: only sale per single customer allowed in bulk and that too with a max of 20 sales) 
+//bulk create sales in one go or create a single sale (note: only sale per single customer allowed in bulk and that too with a max of 10 sales) 
+//in sales api in ui show option do you want to generate bill or not
+//if yes hit generate bill api with same payload + add paymentMethod, referenceNo, note
+//and download bill in new tab
 router.post("/", validateSchema(salesSchema), verifyToken, verifyRole(constants.db.adminCumManager), checkActiveUser, salesController.registerSale);
 router.get("/", verifyToken , checkActiveUser, salesController.getSales);
 // api to update a single sale (note: use it mostly for updating total selling price))

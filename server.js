@@ -17,7 +17,6 @@ new Database();
 const db = Database.getSequelize();
 const cache = new Cache();
 
-
 class AppServer {
   constructor() {
     this.app = express();
@@ -28,6 +27,8 @@ class AppServer {
     this.setupErrorHandler();
     this.startServer();
     this.handleGracefulShutdown();
+    this.handleUncaughtExceptions();
+    this.handleUnhandledRejections();
     this.connectDB();
     if (process.env.REDIS_ENABLE == constants.boolean.true) this.connectCache();
   }
@@ -94,6 +95,20 @@ class AppServer {
 
     process.on("SIGINT", shutdown);
     process.on("SIGTERM", shutdown);
+  }
+
+  handleUncaughtExceptions() {
+    process.on("uncaughtException", (error) => {
+      logger.error(`Uncaught Exception: ${error}`);
+      process.exit(1);
+    });
+  }
+
+  handleUnhandledRejections() {
+    process.on("unhandledRejection", (error) => {
+      logger.error(`Unhandled Rejection: ${error}`);
+      process.exit(1);
+    });
   }
 
   async connectCache() {

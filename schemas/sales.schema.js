@@ -4,7 +4,7 @@ export const salesSchema  = Joi.array().items(Joi.object({
     customerId: Joi.string().uuid().required(),
     productId: Joi.string().uuid().required(),
     colorId: Joi.string().uuid().required(),
-    mrp: Joi.number().integer().min(0).required(),
+    mrp: Joi.number().min(0).required(),
     sizeRangeId: Joi.string().uuid().required(),
     quantity: Joi.number().integer().min(1).required(),
     discountPercentage: Joi.number().integer().min(0).required(),

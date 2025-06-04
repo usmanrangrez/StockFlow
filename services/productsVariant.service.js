@@ -75,11 +75,13 @@ class ProductVariantsService {
   }
 
 
-  async getProductVariantIdFromCombination(productId,colorId,sizeRangeId) {
+  async getProductVariantIdFromCombination(productId,colorId,sizeRangeId,mrp) {
     try {
-      const productVariant = await this.productVariants.findOne({ where: { productId, colorId, sizeRangeId } });
+      const productVariant = await this.productVariants.findOne({
+        where: { productId, colorId, sizeRangeId, mrp },
+      });
       if (!productVariant) {
-        logger.error(`ProductsService.getProductVariantIdFromCombination: Variant with productId ${productId}, colorId ${colorId} and sizeRangeId ${sizeRangeId} not found`);
+        logger.error(`ProductsService.getProductVariantIdFromCombination: Variant with productId ${productId}, colorId ${colorId} and sizeRangeId ${sizeRangeId} not found with mrp ${mrp}`);
         throw new Error(Codes.STX0057);
       }
       return productVariant;

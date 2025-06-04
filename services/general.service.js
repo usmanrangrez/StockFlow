@@ -9,6 +9,7 @@ import ProductVariants from "../models/productVariants.model.js";
 import Colors from "../models/colors.model.js";
 import Sizes from "../models/sizes.model.js";
 import User from "../models/user.model.js";
+import constants from "../config/constants.js";
 const logger = new Logger();
 
 const sequelize = Database.getSequelize();
@@ -24,8 +25,15 @@ class GeneralService {
     this.users = User;
   }
 
-  async getAllDropDowns() {
+  async getAllDropDowns(dropDown) {
     try {
+      if(dropDown){
+        const validDropDowns = constants.validDropDowns;
+        if (!validDropDowns.includes(dropDown)) {
+          throw new Error(`Invalid dropdown type: ${dropDown}`);
+        }
+        return await this[dropDown].findAll();
+      }
       const [users, products, colors, sizes, productsVariants, cartons] =
         await Promise.all([
           this.users.findAll({attributes:["id","username","email"]}),

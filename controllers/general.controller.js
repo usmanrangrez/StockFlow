@@ -8,7 +8,8 @@ class GeneralController {
 
   getAllDropDowns = async (req, res, next) => {
     try {
-      const dropdowns = await this.generalService.getAllDropDowns();
+      const { dropDown } = req.params;
+      const dropdowns = await this.generalService.getAllDropDowns(dropDown);
       res.sendSuccess(200, Codes.STX0084, dropdowns);
     } catch (error) {
       next(error);

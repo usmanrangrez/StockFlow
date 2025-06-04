@@ -38,12 +38,13 @@ class SalesService {
   // Function to check if inventory is available for all sales
   async checkInventoryAvailability(body, t) {
     for (const sale of body) {
-      const { productId, colorId, sizeRangeId, quantity } = sale;
+      const { productId, colorId, sizeRangeId, quantity, mrp } = sale;
       const productVariant =
         await this.productVariantsService.getProductVariantIdFromCombination(
           productId,
           colorId,
-          sizeRangeId
+          sizeRangeId,
+          mrp
         );
 
       const cartons = await this.cartons.findAll({

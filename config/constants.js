@@ -11,6 +11,14 @@ const constants = {
     phone: /^[0-9]{10}$/,
     lettersCumNumbers: /^[a-zA-Z0-9]+$/,
   },
+  validDropDowns: [
+    "users",
+    "products",
+    "colors",
+    "sizes",
+    "productsVariants",
+    "cartons",
+  ],
   db: {
     roles: {
       admin: "admin",
@@ -81,10 +89,10 @@ const constants = {
         modelName: "Customers",
         tableName: "customers",
       },
-      sales:{
+      sales: {
         modelName: "Sales",
         tableName: "sales",
-      }
+      },
     },
   },
 };

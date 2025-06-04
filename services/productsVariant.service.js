@@ -16,11 +16,12 @@ class ProductVariantsService {
           productId: body.productId,
           colorId: body.colorId,
           sizeRangeId: body.sizeRangeId,
+          mrp: body.mrp,
         },
       });
       if (existingVariant)
         throw new Error(
-          `Variant with productId ${body.productId}, colorId ${body.colorId} and sizeRangeId ${body.sizeRangeId} already exists`
+          `Variant with productId ${body.productId}, colorId ${body.colorId} and sizeRangeId ${body.sizeRangeId} and mrp ${body.mrp} already exists`
         );
 
       const createdVariant = await this.productVariants.create(body);

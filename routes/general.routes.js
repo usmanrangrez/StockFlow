@@ -5,6 +5,6 @@ const generalController = new GeneralController();
 
 import { verifyToken, checkActiveUser } from "../middlewares/auth.js";
 
-router.get("/", verifyToken , checkActiveUser, generalController.getAllDropDowns);
+router.get("/{:dropDown}", verifyToken , checkActiveUser, generalController.getAllDropDowns);
 
 export default router;

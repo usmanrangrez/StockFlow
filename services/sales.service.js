@@ -72,13 +72,15 @@ class SalesService {
       customerId,
       quantity,
       discountPercentage,
+      mrp
     } = sale;
 
     const productVariant =
       await this.productVariantsService.getProductVariantIdFromCombination(
         productId,
         colorId,
-        sizeRangeId
+        sizeRangeId,
+        mrp
       );
 
     affectedVariants.add(productVariant.id);

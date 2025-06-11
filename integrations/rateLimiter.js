@@ -5,7 +5,7 @@ const rateLimitter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
   skipSuccessfulRequests: true,
-  message: Codes.GRX0021,
+  message: Codes.STX0001,
   standardHeaders: false,
   legacyHeaders: false,
   handler: (req, res, next) => {
